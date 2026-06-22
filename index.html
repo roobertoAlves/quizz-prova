@@ -10,26 +10,39 @@
   <div class="card" id="quiz-container">
     <div class="header">
       <span class="badge">EDA2 – Estruturas de Dados 2</span>
-      <p id="progresso">Questão 1 de 15</p>
+      <p id="progresso"></p>
       <div class="barra-outer"><div class="barra-inner" id="barra"></div></div>
     </div>
 
-    <div id="tela-quiz">
+    <!-- Tela: selecao de tema -->
+    <div id="tela-menu">
+      <h2 class="menu-titulo">Escolha o tema</h2>
+      <p class="menu-subtitulo">Selecione um topico especifico ou pratique todos misturados.</p>
+      <div id="menu-botoes"></div>
+    </div>
+
+    <!-- Tela: quiz -->
+    <div id="tela-quiz" class="hidden">
       <p id="pergunta"></p>
       <ul id="alternativas"></ul>
       <div id="explicacao" class="hidden"></div>
-      <button id="btn-proximo" disabled onclick="proximaPergunta()">Próxima Pergunta</button>
+      <button id="btn-proximo" disabled onclick="proximaPergunta()">Proxima Pergunta</button>
     </div>
 
+    <!-- Tela: resultado -->
     <div id="tela-resultado" class="hidden">
       <h2>Resultado Final</h2>
+      <p id="tema-escolhido"></p>
       <div class="stats">
         <div class="stat acertos"><span id="num-acertos">0</span><small>Acertos</small></div>
         <div class="stat erros"><span id="num-erros">0</span><small>Erros</small></div>
         <div class="stat pct"><span id="num-pct">0%</span><small>Aproveitamento</small></div>
       </div>
       <p id="mensagem-desempenho"></p>
-      <button onclick="reiniciarQuiz()">Refazer Quiz</button>
+      <div class="resultado-acoes">
+        <button onclick="repetirTema()">Repetir este tema</button>
+        <button class="btn-secundario" onclick="voltarMenu()">Escolher outro tema</button>
+      </div>
     </div>
   </div>
   <script src="src/js/script.js"></script>
