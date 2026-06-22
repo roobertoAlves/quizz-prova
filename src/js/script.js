@@ -22,18 +22,21 @@ function embaralhar(arr) {
 
 // ─── Selecao de questoes ──────────────────────────────────────────────────────
 
+function questoesDaCategoria(nome) {
+  return questoesGlobal.filter(q => q.categoria === nome);
+}
+
 function sortearMisto() {
   const selecionadas = [];
-  for (const { inicio, fim, quantidade_sorteio } of categoriasGlobal) {
-    const fatia = embaralhar(questoesGlobal.slice(inicio, fim + 1));
+  for (const { nome, quantidade_sorteio } of categoriasGlobal) {
+    const fatia = embaralhar(questoesDaCategoria(nome));
     selecionadas.push(...fatia.slice(0, quantidade_sorteio));
   }
   return embaralhar(selecionadas);
 }
 
 function sortearPorTema(nomeCategoria) {
-  const cat = categoriasGlobal.find(c => c.nome === nomeCategoria);
-  return embaralhar(questoesGlobal.slice(cat.inicio, cat.fim + 1));
+  return embaralhar(questoesDaCategoria(nomeCategoria));
 }
 
 // ─── Menu ─────────────────────────────────────────────────────────────────────
@@ -52,7 +55,7 @@ function renderizarMenu() {
   // Botao por categoria
   for (const cat of categoriasGlobal) {
     const btn = document.createElement("button");
-    const total = cat.fim - cat.inicio + 1;
+    const total = questoesDaCategoria(cat.nome).length;
     btn.textContent = `${cat.nome} (${total} questoes)`;
     btn.className = "btn-menu";
     btn.onclick = () => iniciarQuiz(cat.nome);
