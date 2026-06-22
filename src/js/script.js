@@ -1,21 +1,28 @@
-const TOTAL_QUESTOES = 15;
+const TOTAL_MISTO = 15;
 
 let questoesGlobal = [];
 let categoriasGlobal = [];
 let perguntasSelecionadas = [];
+let totalRodada = 0;
+let temaSelecionado = "";
 let atual = 0;
 let pontos = 0;
 let respondida = false;
 
+// ─── Utilitario ──────────────────────────────────────────────────────────────
+
 function embaralhar(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return arr;
+  return a;
 }
 
-function sortearPerguntas() {
+// ─── Selecao de questoes ──────────────────────────────────────────────────────
+
+function sortearMisto() {
   const selecionadas = [];
   for (const { inicio, fim, quantidade_sorteio } of categoriasGlobal) {
     const fatia = embaralhar(questoesGlobal.slice(inicio, fim + 1));
@@ -23,6 +30,60 @@ function sortearPerguntas() {
   }
   return embaralhar(selecionadas);
 }
+
+function sortearPorTema(nomeCategoria) {
+  const cat = categoriasGlobal.find(c => c.nome === nomeCategoria);
+  return embaralhar(questoesGlobal.slice(cat.inicio, cat.fim + 1));
+}
+
+// ─── Menu ─────────────────────────────────────────────────────────────────────
+
+function renderizarMenu() {
+  const container = document.getElementById("menu-botoes");
+  container.innerHTML = "";
+
+  // Botao "Todas"
+  const btnTodas = document.createElement("button");
+  btnTodas.textContent = "Todas — Misturadas (15 questoes)";
+  btnTodas.className = "btn-menu btn-todas";
+  btnTodas.onclick = () => iniciarQuiz("Todas");
+  container.appendChild(btnTodas);
+
+  // Botao por categoria
+  for (const cat of categoriasGlobal) {
+    const btn = document.createElement("button");
+    const total = cat.fim - cat.inicio + 1;
+    btn.textContent = `${cat.nome} (${total} questoes)`;
+    btn.className = "btn-menu";
+    btn.onclick = () => iniciarQuiz(cat.nome);
+    container.appendChild(btn);
+  }
+
+  document.getElementById("progresso").textContent = "";
+  document.getElementById("barra").style.width = "0%";
+}
+
+// ─── Inicio do quiz ───────────────────────────────────────────────────────────
+
+function iniciarQuiz(tema) {
+  temaSelecionado = tema;
+  atual = 0;
+  pontos = 0;
+
+  if (tema === "Todas") {
+    perguntasSelecionadas = sortearMisto();
+  } else {
+    perguntasSelecionadas = sortearPorTema(tema);
+  }
+
+  totalRodada = perguntasSelecionadas.length;
+
+  document.getElementById("tela-menu").classList.add("hidden");
+  document.getElementById("tela-quiz").classList.remove("hidden");
+  carregarPergunta();
+}
+
+// ─── Quiz ─────────────────────────────────────────────────────────────────────
 
 function carregarPergunta() {
   respondida = false;
@@ -33,9 +94,9 @@ function carregarPergunta() {
   divExp.innerHTML = "";
 
   document.getElementById("progresso").textContent =
-    `Questão ${atual + 1} de ${TOTAL_QUESTOES}`;
+    `Questao ${atual + 1} de ${totalRodada} — ${temaSelecionado}`;
   document.getElementById("barra").style.width =
-    `${(atual / TOTAL_QUESTOES) * 100}%`;
+    `${(atual / totalRodada) * 100}%`;
 
   const elPergunta = document.getElementById("pergunta");
   if (q.html) elPergunta.innerHTML = q.pergunta;
@@ -52,8 +113,7 @@ function carregarPergunta() {
 
   const btn = document.getElementById("btn-proximo");
   btn.disabled = true;
-  btn.textContent =
-    atual === TOTAL_QUESTOES - 1 ? "Ver Resultado" : "Próxima Pergunta";
+  btn.textContent = atual === totalRodada - 1 ? "Ver Resultado" : "Proxima Pergunta";
 }
 
 function validarResposta(indice, el) {
@@ -61,7 +121,7 @@ function validarResposta(indice, el) {
   respondida = true;
 
   const itens = document.querySelectorAll("#alternativas li");
-  itens.forEach((li) => li.classList.add("bloqueada"));
+  itens.forEach(li => li.classList.add("bloqueada"));
 
   const q = perguntasSelecionadas[atual];
 
@@ -83,18 +143,21 @@ function validarResposta(indice, el) {
 
 function proximaPergunta() {
   atual++;
-  if (atual < TOTAL_QUESTOES) carregarPergunta();
+  if (atual < totalRodada) carregarPergunta();
   else mostrarResultado();
 }
+
+// ─── Resultado ────────────────────────────────────────────────────────────────
 
 function mostrarResultado() {
   document.getElementById("tela-quiz").classList.add("hidden");
   document.getElementById("tela-resultado").classList.remove("hidden");
   document.getElementById("barra").style.width = "100%";
   document.getElementById("progresso").textContent = "Quiz concluido!";
+  document.getElementById("tema-escolhido").textContent = `Tema: ${temaSelecionado}`;
 
-  const erros = TOTAL_QUESTOES - pontos;
-  const pct = Math.round((pontos / TOTAL_QUESTOES) * 100);
+  const erros = totalRodada - pontos;
+  const pct = Math.round((pontos / totalRodada) * 100);
 
   document.getElementById("num-acertos").textContent = pontos;
   document.getElementById("num-erros").textContent = erros;
@@ -104,27 +167,30 @@ function mostrarResultado() {
     [90, "Excelente! Dominio completo do conteudo!"],
     [70, "Bom! Voce esta bem preparado."],
     [50, "Regular. Revise alguns topicos."],
-    [0, "Precisa estudar mais. Nao desista!"],
+    [0,  "Precisa estudar mais. Nao desista!"],
   ];
-  document.getElementById("mensagem-desempenho").textContent = msgs.find(
-    ([min]) => pct >= min,
-  )[1];
+  document.getElementById("mensagem-desempenho").textContent =
+    msgs.find(([min]) => pct >= min)[1];
 }
 
-function reiniciarQuiz() {
-  atual = 0;
-  pontos = 0;
-  perguntasSelecionadas = sortearPerguntas();
+function repetirTema() {
   document.getElementById("tela-resultado").classList.add("hidden");
   document.getElementById("tela-quiz").classList.remove("hidden");
-  carregarPergunta();
+  iniciarQuiz(temaSelecionado);
 }
 
+function voltarMenu() {
+  document.getElementById("tela-resultado").classList.add("hidden");
+  document.getElementById("tela-menu").classList.remove("hidden");
+  renderizarMenu();
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
 fetch("src/data/banco_questoes.json")
-  .then((r) => r.json())
+  .then(r => r.json())
   .then(({ questoes, metadata: { categorias } }) => {
     questoesGlobal = questoes;
     categoriasGlobal = categorias;
-    perguntasSelecionadas = sortearPerguntas();
-    carregarPergunta();
+    renderizarMenu();
   });
