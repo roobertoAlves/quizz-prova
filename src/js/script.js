@@ -1,0 +1,130 @@
+const TOTAL_QUESTOES = 15;
+
+let questoesGlobal = [];
+let categoriasGlobal = [];
+let perguntasSelecionadas = [];
+let atual = 0;
+let pontos = 0;
+let respondida = false;
+
+function embaralhar(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function sortearPerguntas() {
+  const selecionadas = [];
+  for (const { inicio, fim, quantidade_sorteio } of categoriasGlobal) {
+    const fatia = embaralhar(questoesGlobal.slice(inicio, fim + 1));
+    selecionadas.push(...fatia.slice(0, quantidade_sorteio));
+  }
+  return embaralhar(selecionadas);
+}
+
+function carregarPergunta() {
+  respondida = false;
+
+  const q = perguntasSelecionadas[atual];
+  const divExp = document.getElementById("explicacao");
+  divExp.classList.add("hidden");
+  divExp.innerHTML = "";
+
+  document.getElementById("progresso").textContent =
+    `Questão ${atual + 1} de ${TOTAL_QUESTOES}`;
+  document.getElementById("barra").style.width =
+    `${(atual / TOTAL_QUESTOES) * 100}%`;
+
+  const elPergunta = document.getElementById("pergunta");
+  if (q.html) elPergunta.innerHTML = q.pergunta;
+  else elPergunta.textContent = q.pergunta;
+
+  const ul = document.getElementById("alternativas");
+  ul.innerHTML = "";
+  q.alternativas.forEach((alt, i) => {
+    const li = document.createElement("li");
+    li.textContent = `${String.fromCharCode(65 + i)}. ${alt}`;
+    li.onclick = () => validarResposta(i, li);
+    ul.appendChild(li);
+  });
+
+  const btn = document.getElementById("btn-proximo");
+  btn.disabled = true;
+  btn.textContent =
+    atual === TOTAL_QUESTOES - 1 ? "Ver Resultado" : "Próxima Pergunta";
+}
+
+function validarResposta(indice, el) {
+  if (respondida) return;
+  respondida = true;
+
+  const itens = document.querySelectorAll("#alternativas li");
+  itens.forEach((li) => li.classList.add("bloqueada"));
+
+  const q = perguntasSelecionadas[atual];
+
+  if (indice === q.correta) {
+    el.classList.add("correta");
+    pontos++;
+  } else {
+    el.classList.add("errada");
+    itens[q.correta].classList.add("correta");
+    if (q.explicacao) {
+      const divExp = document.getElementById("explicacao");
+      divExp.innerHTML = `<strong>Por que essa e a resposta correta?</strong>${q.explicacao}`;
+      divExp.classList.remove("hidden");
+    }
+  }
+
+  document.getElementById("btn-proximo").disabled = false;
+}
+
+function proximaPergunta() {
+  atual++;
+  if (atual < TOTAL_QUESTOES) carregarPergunta();
+  else mostrarResultado();
+}
+
+function mostrarResultado() {
+  document.getElementById("tela-quiz").classList.add("hidden");
+  document.getElementById("tela-resultado").classList.remove("hidden");
+  document.getElementById("barra").style.width = "100%";
+  document.getElementById("progresso").textContent = "Quiz concluido!";
+
+  const erros = TOTAL_QUESTOES - pontos;
+  const pct = Math.round((pontos / TOTAL_QUESTOES) * 100);
+
+  document.getElementById("num-acertos").textContent = pontos;
+  document.getElementById("num-erros").textContent = erros;
+  document.getElementById("num-pct").textContent = pct + "%";
+
+  const msgs = [
+    [90, "Excelente! Dominio completo do conteudo!"],
+    [70, "Bom! Voce esta bem preparado."],
+    [50, "Regular. Revise alguns topicos."],
+    [0, "Precisa estudar mais. Nao desista!"],
+  ];
+  document.getElementById("mensagem-desempenho").textContent = msgs.find(
+    ([min]) => pct >= min,
+  )[1];
+}
+
+function reiniciarQuiz() {
+  atual = 0;
+  pontos = 0;
+  perguntasSelecionadas = sortearPerguntas();
+  document.getElementById("tela-resultado").classList.add("hidden");
+  document.getElementById("tela-quiz").classList.remove("hidden");
+  carregarPergunta();
+}
+
+fetch("src/data/banco_questoes.json")
+  .then((r) => r.json())
+  .then(({ questoes, metadata: { categorias } }) => {
+    questoesGlobal = questoes;
+    categoriasGlobal = categorias;
+    perguntasSelecionadas = sortearPerguntas();
+    carregarPergunta();
+  });
