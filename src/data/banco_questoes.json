@@ -4,10 +4,10 @@
     "topicos": ["BST", "AVL", "Rubro-Negra", "Árvore Binária Geral"],
     "total_questoes": 70,
     "categorias": [
-      { "nome": "BST", "inicio": 0, "fim": 19, "quantidade_sorteio": 3 },
-      { "nome": "AVL", "inicio": 20, "fim": 34, "quantidade_sorteio": 3 },
-      { "nome": "Rubro-Negra", "inicio": 35, "fim": 44, "quantidade_sorteio": 2 },
-      { "nome": "Árvore Binária Geral", "inicio": 45, "fim": 54, "quantidade_sorteio": 2 }
+      { "nome": "BST", "inicio": 0, "fim": 19, "quantidade_sorteio": 5 },
+      { "nome": "AVL", "inicio": 20, "fim": 34, "quantidade_sorteio": 4 },
+      { "nome": "Rubro-Negra", "inicio": 35, "fim": 44, "quantidade_sorteio": 3 },
+      { "nome": "Árvore Binária Geral", "inicio": 45, "fim": 54, "quantidade_sorteio": 3 }
     ]
   },
   "questoes": [

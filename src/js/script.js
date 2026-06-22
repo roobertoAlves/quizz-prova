@@ -1,8 +1,11 @@
-const TOTAL_QUESTOES = 10;
+const TOTAL_QUESTOES = 15;
 
+let questoesGlobal = [];
+let categoriasGlobal = [];
 let perguntasSelecionadas = [];
-let questoesGlobal = [], categoriasGlobal = [];
-let atual = 0, pontos = 0, respondida = false;
+let atual = 0;
+let pontos = 0;
+let respondida = false;
 
 function embaralhar(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -23,13 +26,16 @@ function sortearPerguntas() {
 
 function carregarPergunta() {
   respondida = false;
+
   const q = perguntasSelecionadas[atual];
   const divExp = document.getElementById("explicacao");
   divExp.classList.add("hidden");
   divExp.innerHTML = "";
 
-  document.getElementById("progresso").textContent = `Questão ${atual + 1} de ${TOTAL_QUESTOES}`;
-  document.getElementById("barra").style.width = `${(atual / TOTAL_QUESTOES) * 100}%`;
+  document.getElementById("progresso").textContent =
+    `Questão ${atual + 1} de ${TOTAL_QUESTOES}`;
+  document.getElementById("barra").style.width =
+    `${(atual / TOTAL_QUESTOES) * 100}%`;
 
   const elPergunta = document.getElementById("pergunta");
   if (q.html) elPergunta.innerHTML = q.pergunta;
@@ -46,7 +52,8 @@ function carregarPergunta() {
 
   const btn = document.getElementById("btn-proximo");
   btn.disabled = true;
-  btn.textContent = atual === TOTAL_QUESTOES - 1 ? "Ver Resultado" : "Próxima Pergunta";
+  btn.textContent =
+    atual === TOTAL_QUESTOES - 1 ? "Ver Resultado" : "Próxima Pergunta";
 }
 
 function validarResposta(indice, el) {
@@ -54,9 +61,10 @@ function validarResposta(indice, el) {
   respondida = true;
 
   const itens = document.querySelectorAll("#alternativas li");
-  itens.forEach(li => li.classList.add("bloqueada"));
+  itens.forEach((li) => li.classList.add("bloqueada"));
 
   const q = perguntasSelecionadas[atual];
+
   if (indice === q.correta) {
     el.classList.add("correta");
     pontos++;
@@ -65,7 +73,7 @@ function validarResposta(indice, el) {
     itens[q.correta].classList.add("correta");
     if (q.explicacao) {
       const divExp = document.getElementById("explicacao");
-      divExp.innerHTML = `<strong>💡 Por que essa é a resposta correta?</strong>${q.explicacao}`;
+      divExp.innerHTML = `<strong>Por que essa e a resposta correta?</strong>${q.explicacao}`;
       divExp.classList.remove("hidden");
     }
   }
@@ -83,7 +91,7 @@ function mostrarResultado() {
   document.getElementById("tela-quiz").classList.add("hidden");
   document.getElementById("tela-resultado").classList.remove("hidden");
   document.getElementById("barra").style.width = "100%";
-  document.getElementById("progresso").textContent = "Quiz concluído!";
+  document.getElementById("progresso").textContent = "Quiz concluido!";
 
   const erros = TOTAL_QUESTOES - pontos;
   const pct = Math.round((pontos / TOTAL_QUESTOES) * 100);
@@ -93,12 +101,14 @@ function mostrarResultado() {
   document.getElementById("num-pct").textContent = pct + "%";
 
   const msgs = [
-    [90, "🏆 Excelente! Domínio completo do conteúdo!"],
-    [70, "👍 Bom! Você está bem preparado."],
-    [50, "📚 Regular. Revise alguns tópicos."],
-    [0,  "⚠️ Precisa Estudar Mais. Não desista!"],
+    [90, "Excelente! Dominio completo do conteudo!"],
+    [70, "Bom! Voce esta bem preparado."],
+    [50, "Regular. Revise alguns topicos."],
+    [0, "Precisa estudar mais. Nao desista!"],
   ];
-  document.getElementById("mensagem-desempenho").textContent = msgs.find(([min]) => pct >= min)[1];
+  document.getElementById("mensagem-desempenho").textContent = msgs.find(
+    ([min]) => pct >= min,
+  )[1];
 }
 
 function reiniciarQuiz() {
@@ -110,8 +120,8 @@ function reiniciarQuiz() {
   carregarPergunta();
 }
 
-fetch("banco_questoes.json")
-  .then(r => r.json())
+fetch("src/data/banco_questoes.json")
+  .then((r) => r.json())
   .then(({ questoes, metadata: { categorias } }) => {
     questoesGlobal = questoes;
     categoriasGlobal = categorias;
