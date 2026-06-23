@@ -197,6 +197,22 @@ button:disabled { background: #a0aec0; cursor: not-allowed; }
   margin-bottom: .5rem;
 }
 
+/* ─── Botao voltar ───────────────────────────────────────────────────────────── */
+.btn-voltar {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  width: auto;
+  padding: .4rem .9rem;
+  background: transparent;
+  color: #555;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: .85rem;
+  font-weight: 500;
+}
+
+.btn-voltar:hover { background: #f0f4f8; color: #1a202c; border-color: #cbd5e0; }
+
 /* ─── Menu de temas ─────────────────────────────────────────────────────────── */
 .menu-titulo {
   font-size: 1.3rem;

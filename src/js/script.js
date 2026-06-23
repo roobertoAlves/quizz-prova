@@ -182,6 +182,12 @@ function repetirTema() {
   iniciarQuiz(temaSelecionado);
 }
 
+// Confirma volta ao menu durante o quiz
+function confirmarVolta() {
+  if (!confirm("Deseja voltar ao menu? O progresso desta rodada sera perdido.")) return;
+  voltarMenu();
+}
+
 function voltarMenu() {
   document.getElementById("tela-resultado").classList.add("hidden");
   document.getElementById("tela-menu").classList.remove("hidden");
