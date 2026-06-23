@@ -190,6 +190,11 @@ function confirmarVolta() {
 
 function voltarMenu() {
   document.getElementById("tela-resultado").classList.add("hidden");
+  document.getElementById("tela-quiz").classList.add("hidden");
+  document.getElementById("pergunta").innerHTML = "";
+  document.getElementById("alternativas").innerHTML = "";
+  document.getElementById("explicacao").classList.add("hidden");
+  document.getElementById("explicacao").innerHTML = "";
   document.getElementById("tela-menu").classList.remove("hidden");
   renderizarMenu();
 }
